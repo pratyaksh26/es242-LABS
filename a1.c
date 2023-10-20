@@ -10,20 +10,48 @@
  * Selections should be generated in lexicographic order.
  * a[0..k-1] is the smallest selection and a[n-k..n-1] is the largest.
  */
-void generate_selections(int a[], int n, int k, int b[], void *data, void (*process_selection)(int *b, int k, void *data))
-{
-    b[0] = 2; b[1] = 1;
-    process_selection(b, 2, data);
-    b[0] = 2; b[1] = 6;
-    process_selection(b, 2, data);
-    b[0] = 2; b[1] = 5;
-    process_selection(b, 2, data);
-    b[0] = 1; b[1] = 6;
-    process_selection(b, 2, data);
-    b[0] = 1; b[1] = 5;
-    process_selection(b, 2, data);
-    b[0] = 6; b[1] = 5;
-    process_selection(b, 2, data);
+void process_selection(int *b, int k, void *data) {
+    int i = 0;
+    while (i < k) {
+    printf("%d ", b[i]);
+    i++;
+}
+
+    printf("\n");
+}
+
+
+void generate_selections(int a[], int n, int k, int b[], void *data, void (*process_selection)(int *b, int k, void *data)) {
+    int ind[k];
+    int i = 0;
+    while (i < k) {
+    ind[i] = i;
+    i++;
+}
+
+    while (ind[0] < n - k + 1) {
+        for (int i = 0; i < k; i++) {
+            b[i] = a[ind[i]];
+        }
+
+        process_selection(b, k, data);
+
+        int i = k - 1;
+        while (i >= 0 && ind[i] == n - k + i) {
+            i--;
+        }
+
+        if (i < 0) {
+            break;
+        }
+
+        ind[i]++;
+        int j = i + 1;
+    while (j < k) {
+    ind[j] = ind[j - 1] + 1;
+    j++;
+}
+}
 }
 
 /*
@@ -167,19 +195,23 @@ void test_splits_art(char buf[], void *data)
 }
 
 BEGIN_TEST(generate_splits) {
-    const char *a = "artistoil";
-    const char *dict[] = {
-        "art",
-        "artist",
-        "is",
-        "oil",
-        "toil"
-    };
-    int nwords = 5;
-    state_t s = { .index = 0, .err = 1, .first = 1 };
-    char buf[256];
-    generate_splits(a, dict, nwords, buf, &s, test_splits_art);
-    ASSERT(!s.err, "Failed on 'artistoil'.");
+     int a[] = { 1, 5, 6, 2, 3, 4 };
+    previous_permutation(a, 6);
+    ASSERT_ARRAY_VALUES_EQ(a, 6, "Failed on 1 5 6 2 3 4.", 1, 5, 4, 6, 3, 2);
+
+    int aa[] = { 1, 2, 3, 5, 4, 6 };
+    previous_permutation(aa, 3); // 3 is correct.
+    ASSERT_ARRAY_VALUES_EQ(aa, 3, "Failed on 1 2 3.", 1, 2, 3);
+
+    previous_permutation(aa, 1);
+    ASSERT_ARRAY_VALUES_EQ(aa, 6, "Failed on aa, 1.", 1, 2, 3, 5, 4, 6);
+
+    int bb[] = { 1, 1, 1, 1 };
+    previous_permutation(bb, 4);
+    ASSERT_ARRAY_VALUES_EQ(bb, 4, "Failed on 4 1s.", 1, 1, 1, 1);
+
+    previous_permutation(aa+3, 3);
+    ASSERT_ARRAY_VALUES_EQ(aa, 6, "Failed on last part of aa.", 1, 2, 3, 4, 6, 5);
 } END_TEST
 
 BEGIN_TEST(previous_permutation) {
